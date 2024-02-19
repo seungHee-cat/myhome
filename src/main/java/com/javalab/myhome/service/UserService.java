@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-// 패스워드 암호화, 권한 추가
 public class UserService {
     @Autowired
     private UserRepository userRepository;
