@@ -2,12 +2,13 @@ package com.javalab.myhome.controller;
 
 import com.javalab.myhome.model.Board;
 import com.javalab.myhome.repository.BoardRepository;
+import com.javalab.myhome.service.BoardService;
 import com.javalab.myhome.validator.BoardValidator;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
+
 @Controller
 @RequestMapping("/board")
 public class BoardController {
@@ -23,6 +26,8 @@ public class BoardController {
     private BoardRepository boardRepository;
     @Autowired
     private BoardValidator boardValidator;
+    @Autowired
+    private BoardService boardService;
 
     @GetMapping("/list")
     public String list(Model model, @PageableDefault(size = 2) Pageable pageable,
@@ -49,12 +54,14 @@ public class BoardController {
     }
 
     @PostMapping("/form")
-    public String greetingSubmit(@Valid Board board, BindingResult bindingResult) {
+    public String postForm(@Valid Board board, BindingResult bindingResult, Authentication authentication) {
         boardValidator.validate(board, bindingResult);
         if (bindingResult.hasErrors()) {
             return "board/form";
         }
-        boardRepository.save(board);
+        // spring security에서 제공하는 인증을 통해 사용자 정보를 받아온다.
+        String username = authentication.getName();
+        boardService.save(username, board);
         return "redirect:/board/list";
     }
 }

@@ -1,8 +1,9 @@
 package com.javalab.myhome.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +18,19 @@ public class User {
     private String password;
     private Boolean enabled;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
+
     private List<Role> roles = new ArrayList<>();
+
+    // Board의 user 변수와 연결
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Board> boards = new ArrayList<>();
+
 }
